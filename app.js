@@ -97,10 +97,33 @@ const lowInv = () =>{
         `SELECT * FROM products WHERE stock_quantity<10`,
         function (err,res){
             if(err) throw err;
-            console.log(res.query);
+            result="";
+            res.forEach((data)=>{console.table(data)})
+            return superAction();
         }
     )
 }
+
+const updateInv =(qt,Id) =>{
+    console.log("Updating the Inventory!")
+    let query= connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [{
+            stock_quantity: qt
+        },
+        {
+            item_id: Id   
+        }
+    ],
+    function(err,res){
+        if(err) throw err;
+        console.log(res.affectedRows + "Products Updated!\n")
+        superAction()
+    }
+    )
+    console.log(query.sql)
+}
+
 
 // checks if we have sufficient inv
 const checkInv = (inv,Id)=>{
@@ -136,8 +159,9 @@ const superAction = () =>{
         type: "list",
         name:"choice",
         message: 'Welcome, what would you like to do today?',
-        choices: ["View Products", "View low Inventor", "Update Inventory", "Add Product"],
+        choices: ["View Products", "View low Inventor", "Update Inventory", "Add Product","quit"],
     }]).then(function(res){
+        console.log(res.choice)
         switch (res.choice){
             case "View Products":
                     tableOnly();
@@ -145,7 +169,17 @@ const superAction = () =>{
         }
         switch(res.choice){
              case "Update Inventory":
-                ;
+                 inquirer.prompt([{
+                     type:"input",
+                     name: "choice",
+                     message: "Which item_id would you like to update? How many will you be adding?"
+                 }]).then(function(res){
+                     console.log(typeof(res.choice))
+                    answer= res.choice.split(" ");
+                    console.log(answer)
+                   return updateInv(answer[0],answer[1]);
+
+                 });
         };
            switch(res.choice){
               case "Add Product": 
@@ -155,7 +189,14 @@ const superAction = () =>{
             case "View low Inventor":
                 lowInv();
                 break;
+            
         }; 
+        switch(res.choice){
+            case "quit":
+               console.log("Good Bye!");
+                process.exit(0);
+
+        }
             
         })
     }
