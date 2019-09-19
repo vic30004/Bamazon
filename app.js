@@ -3,11 +3,6 @@ const inquirer = require('inquirer');
 const mysql = require('mysql');
 const fs = require('fs');
 count =20;
-// Starter Info for DB
-let randomProd=  faker.commerce.productName();
-let randomPrice = faker.commerce.price();
-let dept = faker.commerce.department();
-let randomNum = Math.floor(Math.random()*100)+1;
 // functions
 const updateFile = () =>{
     fs.appendFile("seed.sql", `\nINSERT INTO products (product_name, department_name,price,stock_quantity) VALUES ("${faker.commerce.productName()}","${faker.commerce.department()}",${faker.commerce.price()},${Math.floor(Math.random()*100)+1});\n`, function(err){
@@ -145,7 +140,7 @@ const tableOnly = ()=>{
 
 //logs out a table
 const loadTable = () =>{
-    connection.query("SELECT * FROM products LIMIT 5", function(err,res){
+    connection.query("SELECT * FROM products", function(err,res){
         if (err) throw err;
         console.table(res);
         askCust(res)
@@ -172,7 +167,7 @@ const superAction = () =>{
                  inquirer.prompt([{
                      type:"input",
                      name: "choice",
-                     message: "Which item_id would you like to update? How many will you be adding?"
+                     message: "How many will you be adding? Which item_id would you like to update? [quantity, ID]"
                  }]).then(function(res){
                      console.log(typeof(res.choice))
                     answer= res.choice.split(" ");
